@@ -2501,7 +2501,6 @@ void CMD_Wait(F_CMD_ARGS)
 			}
 			free(wait_string);
 			wait_string = xstrdup(temp);
-
 			for (i = strlen(wait_string) - 1; i >= 0 &&
 				     isspace(wait_string[i]); i--)
 			{

@@ -15,7 +15,6 @@
 #include "config.h"
 
 #include <stdio.h>
-#include <stdint.h>
 #include <err.h>
 #include <sys/param.h>
 #include <stdint.h>
