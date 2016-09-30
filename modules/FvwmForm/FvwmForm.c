@@ -631,7 +631,11 @@ static void ct_InputPointerFore(char *cp) {
 static void ct_Line(char *cp)
 {
   /* malloc new line */
+<<<<<<< HEAD
   cur_line->next = xmalloc(sizeof(struct _line));
+=======
+  cur_line->next = (struct _line *)xmalloc(sizeof(struct _line));
+>>>>>>> ba4888a4... malloc namespace changes
   memset(cur_line->next, 0, sizeof(struct _line));
   cur_line = cur_line->next;		/* new current line */
   cur_line->next = &root_line;		/* new next ptr, (actually root) */
@@ -786,7 +790,11 @@ static void AssignDrawTable(Item *adt_item)
 
   /* Time to add a DrawTable */
   /* get one */
+<<<<<<< HEAD
   new_dt = xmalloc(sizeof(struct _drawtable));
+=======
+  new_dt = (struct _drawtable *)xmalloc(sizeof(struct _drawtable));
+>>>>>>> ba4888a4... malloc namespace changes
   memset(new_dt, 0, sizeof(struct _drawtable));
   new_dt->dt_next = 0;			/* new end of list */
   if (CF.roots_dt == 0) {		   /* If first entry in list */
@@ -817,7 +825,11 @@ static void AddItem(void)
 {
   Item *save_item;
   save_item = (Item *)item;		/* save current item */
+<<<<<<< HEAD
   item = xcalloc(sizeof(Item), 1); /* get a new item */
+=======
+  item = (Item *)xcalloc(sizeof(Item),1); /* get a new item */
+>>>>>>> ba4888a4... malloc namespace changes
   if (save_item == 0) {			/* if first item */
     root_item_ptr = item;		/* save root item */
   } else {				/* else not first item */
@@ -973,11 +985,19 @@ static void ct_Input(char *cp)
     free(item->input.init_value);
     item->input.init_value = CopyQuotedString(++cp);
   }
+<<<<<<< HEAD
   item->input.blanks = xmalloc(item->input.size);
   for (j = 0; j < item->input.size; j++)
     item->input.blanks[j] = ' ';
   item->input.buf = strlen(item->input.init_value) + 1;
   item->input.value = xmalloc(item->input.buf);
+=======
+  item->input.blanks = (char *)xmalloc(item->input.size);
+  for (j = 0; j < item->input.size; j++)
+    item->input.blanks[j] = ' ';
+  item->input.buf = strlen(item->input.init_value) + 1;
+  item->input.value = (char *)xmalloc(item->input.buf);
+>>>>>>> ba4888a4... malloc namespace changes
   item->input.value[0] = 0;		/* avoid reading unitialized data */
 
   item->header.size_x = item->header.dt_ptr->dt_Ffont->max_char_width
@@ -1078,7 +1098,11 @@ static void PutDataInForm(char *cp)
 	var_len = strlen(cp);
 	if (item->input.init_value)
 	  free(item->input.init_value);
+<<<<<<< HEAD
 	item->input.init_value = xmalloc(var_len + 1);
+=======
+	item->input.init_value = xmalloc(var_len+1);
+>>>>>>> ba4888a4... malloc namespace changes
 	strcpy(item->input.init_value,cp); /* new initial value in field */
 	if (item->input.value)
 	  free(item->input.value);
@@ -1187,9 +1211,16 @@ static void ct_Choice(char *cp)
       <= cur_sel->selection.n) {	   /* no room */
     cur_sel->selection.choices_array_count += CHOICES_PER_SEL_EXPANSION;
     cur_sel->selection.choices =
+<<<<<<< HEAD
       xrealloc((void *)cur_sel->selection.choices,
                sizeof(Item *) * cur_sel->selection.choices_array_count,
 	       sizeof(cur_sel->selection.choices)); /* expand */
+=======
+      (Item **)xrealloc((void *)cur_sel->selection.choices,
+			   sizeof(Item *) *
+			   cur_sel->selection.choices_array_count,
+			   sizeof(char *)); /* expand */
+>>>>>>> ba4888a4... malloc namespace changes
   }
 
   cur_sel->selection.choices[cur_sel->selection.n++] = item;
@@ -1251,9 +1282,16 @@ static void ct_Command(char *cp)
   {
     cur_button->button.button_array_size += BUTTON_COMMAND_EXPANSION;
     cur_button->button.commands =
+<<<<<<< HEAD
       xrealloc((void *)cur_button->button.commands,
                sizeof(char *) * cur_button->button.button_array_size,
 	       sizeof(cur_button->button.commands));
+=======
+      (char **)xrealloc((void *)cur_button->button.commands,
+			   sizeof(char *) *
+			   cur_button->button.button_array_size,
+			   sizeof(char *));
+>>>>>>> ba4888a4... malloc namespace changes
   }
   cur_button->button.commands[cur_button->button.n++] = xstrdup(cp);
 }
@@ -1440,7 +1478,11 @@ static void Restart(void)
       if (item->input.value && item->input.value[0] != 0) { /* ? to save */
 	if (item->input.value_history_ptr == 0) {  /* no history yet */
 	  item->input.value_history_ptr =
+<<<<<<< HEAD
 	    xcalloc(sizeof(char *), 50);
+=======
+	    (char **)xcalloc(sizeof(char *), 50);
+>>>>>>> ba4888a4... malloc namespace changes
 	  item->input.value_history_ptr[0] = xstrdup(item->input.value);
 	  item->input.value_history_count = 1; /* next insertion point */
 	  myfprintf((stderr,"Initial save of %s in slot 0\n",
@@ -2418,8 +2460,13 @@ static void process_message(unsigned long type, unsigned long *body)
       }
       if (CF.last_error->text.n <= msg_len) { /* if message wont fit */
 	CF.last_error->text.value = xrealloc(CF.last_error->text.value,
+<<<<<<< HEAD
                                              msg_len * 2,
 					     sizeof(CF.last_error->text.value));
+=======
+						msg_len * 2,
+						sizeof(char *));
+>>>>>>> ba4888a4... malloc namespace changes
 	CF.last_error->text.n = msg_len * 2;
       }
       strncpy(CF.last_error->text.value,msg_ptr,

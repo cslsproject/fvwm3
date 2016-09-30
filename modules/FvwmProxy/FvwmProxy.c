@@ -378,7 +378,7 @@ static void parse_cmd(char **ret_cmd, char *cmd)
 	}
 	if (cmd != NULL)
 	{
-		*ret_cmd = safestrdup(cmd);
+		*ret_cmd = xstrdup(cmd);
 	}
 
 	return;
@@ -1231,7 +1231,7 @@ static void DrawWindow(
 	{
 		free(proxy->iconname);
 	}
-	proxy->iconname = safestrdup("    ");
+	proxy->iconname = xstrdup("    ");
 	sprintf(proxy->iconname, "%d", proxy->stack);
 #endif
 

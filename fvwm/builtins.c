@@ -2396,7 +2396,7 @@ void CMD_Exec(F_CMD_ARGS)
 #if 0
 	if (strncasecmp(action,"exec",4)!=0)
 	{
-		cmd = (char *)safemalloc(strlen(action)+6);
+		cmd = (char *)xmalloc(strlen(action)+6);
 		strcpy(cmd,"exec ");
 		strcat(cmd,action);
 	}
