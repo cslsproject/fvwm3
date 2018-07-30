@@ -20,8 +20,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -215,13 +214,14 @@ int main ( int argc, char *argv[])
   }
 
   /* create 2 fifos */
-  fm_name = safemalloc( strlen(f_stem) + 2 );
+  /* TA:  FIXME!  xasprintf() */
+  fm_name = xmalloc( strlen(f_stem) + 2 );
   strcpy(fm_name,f_stem);
   strcat(fm_name, "M");
-  fc_name = safemalloc( strlen(f_stem) + 2 );
+  fc_name = xmalloc( strlen(f_stem) + 2 );
   strcpy(fc_name,f_stem);
   strcat(fc_name, "C");
-  s = safemalloc( strlen(f_stem) + 2 );
+  s = xmalloc( strlen(f_stem) + 2 );
   strcpy(s,f_stem);
   strcat(s, "R");
 
@@ -532,7 +532,7 @@ void usage(void)
   fprintf (stderr,
 	   "  -v                  print version number\n");
   fprintf (stderr,
-	   "  -w <micro sec>      waiting time for the reponse from fvwm\n");
+	   "  -w <micro sec>      waiting time for the response from fvwm\n");
   fprintf (stderr, "\nDefault fifo names are ~/.%sC and ~/.%sM\n",
 	   MYNAME, MYNAME);
   fprintf (stderr, "Default waiting time is 500,000 us\n");

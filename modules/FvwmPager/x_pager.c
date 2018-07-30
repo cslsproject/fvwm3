@@ -15,8 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307	 USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -2804,7 +2803,7 @@ static void label_window_wrap(PagerWindow *t)
       }
     }
 
-    FwinString->str = safemalloc(next - cur + 1);
+    FwinString->str = xmalloc(next - cur + 1);
     strncpy(FwinString->str, cur, next - cur);
     FwinString->str[next - cur] = 0;
 
@@ -3331,7 +3330,7 @@ static void InsertExpand(char **dest, char *s)
   if (!s || !*s)
     return;
   len = strlen(*dest) + strlen(s) + 1;
-  *dest = (char *)safemalloc(len);
+  *dest = xmalloc(len);
   strcpy(*dest, tmp);
   free(tmp);
   strcat(*dest, s);
@@ -3343,7 +3342,7 @@ static void InsertExpand(char **dest, char *s)
    -- disching@fmi.uni-passau.de */
 char *GetBalloonLabel(const PagerWindow *pw,const char *fmt)
 {
-  char *dest = safestrdup("");
+  char *dest = xstrdup("");
   const char *pos = fmt;
   char buffer[2];
 

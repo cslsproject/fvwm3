@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -374,6 +373,22 @@ static void fix_manager_size(WinManager *man, int w, int h)
   XSetWMNormalHints(theDisplay, man->theWindow, &size);
 }
 
+static void release_manager_size(WinManager *man)
+{
+  XSizeHints size;
+  long mask;
+
+  if (man->geometry.dir & GROW_FIXED)
+    return;
+
+  FGetWMNormalHints(theDisplay, man->theWindow, &size, &mask);
+  size.min_width = 1;
+  size.max_width = 65535;
+  size.min_height = 1;
+  size.max_height = 65535;
+  XSetWMNormalHints(theDisplay, man->theWindow, &size);
+}
+
 /* Like XMoveResizeWindow(), but can move in arbitary directions */
 static void resize_window(WinManager *man)
 {
@@ -381,7 +396,9 @@ static void resize_window(WinManager *man)
   int x_changed, y_changed, dir;
 
   dir = man->geometry.dir;
-  fix_manager_size(man, man->geometry.width, man->geometry.height);
+  /* Remove any size limits so that the window can be resized without
+   * warnings. */
+  release_manager_size(man);
 
   if ((dir & GROW_DOWN) && (dir & GROW_RIGHT)) {
     XResizeWindow(theDisplay, man->theWindow, man->geometry.width,
@@ -421,6 +438,7 @@ static void resize_window(WinManager *man)
     }
     MyXUngrabServer(theDisplay);
   }
+  fix_manager_size(man, man->geometry.width, man->geometry.height);
 }
 
 static char *make_display_string(WinData *win, char *format, int len)
@@ -633,12 +651,10 @@ static void set_num_buttons(ButtonArray *buttons, int n)
 
   if (n > buttons->num_buttons) {
     buttons->dirty_flags |= NUM_BUTTONS_CHANGED;
-    buttons->buttons = (Button **)saferealloc((void *)buttons->buttons,
-					   n * sizeof(Button *));
+    buttons->buttons = xrealloc((void *)buttons->buttons, n, sizeof(Button *));
 
     for (i = buttons->num_buttons; i < n; i++) {
-      buttons->buttons[i] = (Button *)safemalloc(sizeof(Button));
-      memset(buttons->buttons[i], 0, sizeof(Button));
+      buttons->buttons[i] = xcalloc(1, sizeof(Button));
       buttons->buttons[i]->drawn_state.display_string = NULL;
       buttons->buttons[i]->index = i;
     }

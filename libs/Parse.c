@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307	 USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -151,7 +150,7 @@ char *EscapeString(char *s, const char *qchars, char echar)
 			len++;
 		}
 	}
-	ret = (char *)safemalloc(len);
+	ret = xmalloc(len);
 	for (t = ret; *s; s++, t++)
 	{
 		if (strchr(qchars, *s) != NULL)
@@ -275,7 +274,7 @@ char *GetQuotedString(
 		t = SkipQuote(t, qlong, qstart, qend);
 	}
 	len = t - sin;
-	*sout = (char *)safemalloc(len + 1);
+	*sout = xmalloc(len + 1);
 	memcpy(*sout, sin, len);
 	(*sout)[len] = 0;
 	if (*t)
@@ -480,7 +479,7 @@ char *DoGetNextToken(
 	}
 	else
 	{
-		*token = safestrdup(tmptok);
+		*token = xstrdup(tmptok);
 	}
 
 	return end;
@@ -939,7 +938,9 @@ char *GetFileNameFromPath(char *path)
 	{
 		s = path;
 	}
-	name = (char *)safemalloc(strlen(s)+1);
+
+	/* TA:  FIXME!  xasprintf() */
+	name = xmalloc(strlen(s)+1);
 	strcpy(name, s);
 
 	return name;

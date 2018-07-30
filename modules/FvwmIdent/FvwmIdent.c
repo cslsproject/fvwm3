@@ -21,8 +21,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -1089,8 +1088,7 @@ void AddToList(char *s1, char* s2)
 	max_col1 = max_col1 > tw1 ? max_col1 : tw1;
 	max_col2 = max_col2 > tw2 ? max_col2 : tw2;
 
-	item = (struct Item*)safemalloc(sizeof(struct Item));
-
+	item = xmalloc(sizeof(struct Item));
 	item->col1 = s1;
 	item->col2 = s2;
 	item->next = NULL;

@@ -5,12 +5,6 @@
  * This module, and the entire GoodStuff program, and the concept for
  * interfacing this module to the Window Manager, are all original work
  * by Robert Nation
- *
- * Copyright 1993, Robert Nation. No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact.
- *
  */
 
 /* This program is free software; you can redistribute it and/or modify
@@ -24,8 +18,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -1194,8 +1187,8 @@ static void ParseButton(button_info **uberb, char *s)
 					b->swallow |= 1;
 					if (!(b->swallow & b_NoHints))
 					{
-						b->hints = (XSizeHints*)
-						mymalloc(sizeof(XSizeHints));
+						b->hints = xmalloc(
+							sizeof(XSizeHints));
 					}
 					if (o)
 					{
@@ -1727,7 +1720,7 @@ static void ParseButton(button_info **uberb, char *s)
 		b->hangon = seekright(&s);
 		if (!b->hangon)
 		{
-			b->hangon = safestrdup("");
+			b->hangon = xstrdup("");
 		}
 		if (tolower(*s) == 's')
 		{
@@ -1743,7 +1736,7 @@ static void ParseButton(button_info **uberb, char *s)
 		s = trimleft(s);
 		if (!(b->swallow & b_NoHints))
 		{
-			b->hints = (XSizeHints*)mymalloc(sizeof(XSizeHints));
+			b->hints = xmalloc(sizeof(XSizeHints));
 		}
 		if (*s)
 		{
@@ -1751,7 +1744,7 @@ static void ParseButton(button_info **uberb, char *s)
 			{
 				SendText(fd, s, 0);
 			}
-			b->spawn = safestrdup(s);
+			b->spawn = xstrdup(s);
 		}
 	}
 	else if (*s)
@@ -2061,7 +2054,7 @@ void ParseConfiguration(button_info *ub)
 		NULL
 	};
 
-	items[0] = mymalloc(strlen(MyName) + 2);
+	items[0] = xmalloc(strlen(MyName) + 2);
 	sprintf(items[0], "*%s", MyName);
 
 	/* send config lines with MyName */

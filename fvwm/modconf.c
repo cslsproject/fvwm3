@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -131,8 +130,7 @@ static struct moduleInfoList *AddToModList(char *tline)
 		t = t->next;
 	}
 
-	this = (struct moduleInfoList *)safemalloc(
-		sizeof(struct moduleInfoList));
+	this = xmalloc(sizeof(struct moduleInfoList));
 
 	this->alias_len = 0;
 	if (alias_end && alias_end[0] == MODULE_CONFIG_DELIM)
@@ -146,7 +144,7 @@ static struct moduleInfoList *AddToModList(char *tline)
 		this->alias_len = alias_end - tline;
 	}
 
-	this->data = (char *)safemalloc(strlen(rline)+1);
+	this->data = xmalloc(strlen(rline)+1);
 	strcpy(this->data, rline);
 
 	this->next = NULL;
@@ -258,7 +256,8 @@ static void send_desktop_names(fmodule *module)
 	{
 		if (d->name != NULL)
 		{
-			name = (char *)safemalloc(strlen(d->name) + 44);
+			/* TA:  FIXME!  xasprintf() */
+			name = xmalloc(strlen(d->name) + 44);
 			sprintf(name,"DesktopName %d %s", d->desk, d->name);
 			SendName(module, M_CONFIG_INFO, 0, 0, 0, name);
 			free(name);
@@ -286,7 +285,8 @@ static void send_image_path(fmodule *module)
 
 	if (ImagePath && *ImagePath != 0)
 	{
-		msg = safemalloc(strlen(ImagePath) + 12);
+		/* TA:  FIXME!  xasprintf() */
+		msg = xmalloc(strlen(ImagePath) + 12);
 		sprintf(msg, "ImagePath %s\n", ImagePath);
 		SendName(module, M_CONFIG_INFO, 0, 0, 0, msg);
 		free(msg);

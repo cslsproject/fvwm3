@@ -1083,8 +1083,7 @@ char *yytext;
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 # include "config.h"
 # include "script.h"
@@ -1929,7 +1928,7 @@ case 110:
 YY_RULE_SETUP
 #line 171 "scanner.l"
 {
-		  yylval.str=(char*) safestrdup(yytext+1);
+		  yylval.str=xstrdup(yytext + 1);
 		  yylval.str[yyleng-1]='\0';
                   return VAR;
 		}
@@ -1939,7 +1938,7 @@ case 111:
 YY_RULE_SETUP
 #line 177 "scanner.l"
 { /* Str entre "" */
-		  yylval.str=(char*) safestrdup(yytext+1);
+		  yylval.str=xstrdup(yytext + 1);
 		  yylval.str[yyleng-2]='\0';
                   return GSTR;
 		}
@@ -1947,7 +1946,7 @@ YY_RULE_SETUP
 case 112:
 YY_RULE_SETUP
 #line 183 "scanner.l"
-{ yylval.str=(char*) safestrdup(yytext);
+{ yylval.str=xstrdup(yytext);
 		  yylval.str[yyleng]='\0';
                   return STR;
 		}

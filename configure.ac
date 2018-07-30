@@ -13,7 +13,7 @@ fi
 # Silence warning: ar: 'u' modifier ignored since 'D' is the default
 AC_SUBST(AR_FLAGS, [cr])
 
-AC_INIT([fvwm],
+AC_INIT([fvwm3],
 	m4_esyscmd_s([utils/fvwm-version-str.sh]),
 	[fvwm-workers@fvwm.org])
 AC_CONFIG_AUX_DIR(etc)
@@ -65,8 +65,13 @@ AC_CHECK_PROG(SED, sed, sed, "")
 AC_SUBST(SED)
 
 # optional python:
-AM_PATH_PYTHON([2.5],, [:])
-
+PYTHON=
+REQUIRED_PYTHON_VERSION=3.0
+AC_SUBST(REQUIRED_PYTHON_VERSION)
+AC_PATH_PROG([PYTHON],[python3],[:])
+AS_IF([test "$PYTHON" != ":"],
+            [AM_PYTHON_CHECK_VERSION([$PYTHON],[$REQUIRED_PYTHON_VERSION],[:],
+				     [PYTHON=":"])])
 #!!!
 PERL=""
 REQUIRED_PERL_VERSION=5.004
@@ -93,9 +98,11 @@ AC_MSG_RESULT([assuming $PERL as perl location])
 AC_SUBST(PERL)
 
 # installation paths
-FVWM_MODULESUBDIR=/${PACKAGE}/${VERSION}
-FVWM_DATASUBDIR=/${PACKAGE}
-FVWM_DOCSUBDIR=/doc/${PACKAGE}
+transform=`echo "${program_transform_name}" | "$SED" -e 's/\\$\\$/\\$/'`
+PPACKAGE=`echo "${PACKAGE}" | "$SED" -e "${transform}"`
+FVWM_MODULESUBDIR=/${PPACKAGE}/${VERSION}
+FVWM_DATASUBDIR=/${PPACKAGE}
+FVWM_DOCSUBDIR=/doc/${PPACKAGE}
 
 AC_ARG_ENABLE(package-subdirs,
   AS_HELP_STRING([--disable-package-subdirs],
@@ -375,7 +382,7 @@ AC_ARG_ENABLE(mandoc,
 		with_mandoc="no"
 		problem_mandoc=": Explicitly disabled"
 	fi ],
-  [ with_mandoc="not specified, check" ]
+  [ with_mandoc="no" ]
 )
 
 if test ! x"$with_mandoc" = xno; then
@@ -677,15 +684,18 @@ AH_TEMPLATE([HAVE_XFT],[Define if Xft library is used.])
 AH_TEMPLATE([HAVE_XFT2],[Define if Xft 2 library is used.])
 AH_TEMPLATE([HAVE_XFT_UTF8],[Define if Xft library can handle utf8 encoding])
 if test ! x"$with_xft" = xno; then
+  AC_MSG_CHECKING([whether pkg-config could find freetype2])
+  if "${PKG_CONFIG}" --exists freetype2; then
+    AC_MSG_RESULT([yes])
+    CFLAGS_FREETYPE=`"${PKG_CONFIG}" --cflags freetype2`
+    FREETYPE_LIBS=`"${PKG_CONFIG}" --libs freetype2`
+    CFLAGS="$CFLAGS $CFLAGS_FREETYPE"
+    LIBS="$LIBS $FREETYPE_LIBS"
 
-  # first check for freetype2
-  have_freetype=no
-  AM_CHECK_FT2(6.1.0)
-  if test x"$no_ft" = x; then
     have_freetype=yes
   else
-    have_freetype=no
-    problem_xft=": Can't detect freetype2 >= 6.1.0/2.0.6"
+  AC_MSG_RESULT([no])
+  have_freetype=no
   fi
 
   # check for fontconfig for Xft 2
@@ -1253,7 +1263,7 @@ AC_ARG_ENABLE(perllib,
 AC_SUBST(FVWM_PERLLIB)
 
 # ******* gettext
-ALL_LINGUAS="ar de fr sv_SE zh_CN ru es"
+ALL_LINGUAS="ar da de fr sv_SE zh_CN ru es"
 FVWM_DOMAIN="fvwm"
 FVWMSCRIPT_DOMAIN="FvwmScript"
 ALL_DOMAINS="$FVWM_DOMAIN $FVWMTASKBAR_DOMAIN $FVWMSCRIPT_DOMAIN"
@@ -1409,18 +1419,6 @@ if test x"$no_imlib" = x; then
 else
   with_gdkimlib=no
   problem_gdkimlib=": Failed on gdk-imlib, see config.log"
-fi
-
-GNOME_INIT_HOOK
-
-# Unfortunately we have 2 gnome supports: WM hints and gnome libs.
-# The $with_gnomehints below refers to the first, not GNOME_INIT_HOOK.
-if test ! x"$enable_gnome_hints" = xno; then
-  with_gnomehints=yes
-  problem_gnomehints=""
-else
-  with_gnomehints=no
-  problem_gnomehints=": Explicitly disabled"
 fi
 
 # Define some compatibility macros needed for config.h.
@@ -1599,6 +1597,10 @@ AH_VERBATIM([_ZEND_EXPLICIT_DEFINITIONS],
  * warnings. */
 #define SUPPRESS_UNUSED_VAR_WARNING(x) \
 do { void *p; p = (void *)&x; (void)p; } while (0);
+
+#ifndef HAVE_STRLCPY
+#   include "libs/strlcpy.h"
+#endif
 ])
 
 # mainly for fvwm-config
@@ -1709,6 +1711,7 @@ dnl
 	modules/FvwmBanner/Makefile
 	modules/FvwmButtons/Makefile
 	modules/FvwmCommand/Makefile
+	modules/FvwmCommandS/Makefile
 	modules/FvwmCommand/scripts/Makefile
 	modules/FvwmConsole/Makefile
 	modules/FvwmConsole/FvwmConsoleC.pl

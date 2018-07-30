@@ -11,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -1912,8 +1911,7 @@ CombineChars(
 	}
 
 	/* decompose composed characters */
-	source = (unsigned short *)safemalloc(
-		(len + 1) * sizeof(unsigned short));
+	source = xmalloc((len + 1) * sizeof(unsigned short));
 	/* convert from UTF-8-encoded text to internal 16-bit encoding */
 	str_len = convert_to_ucs2(str_visual,source,len);
 	in_str_len = str_len;
@@ -1921,12 +1919,11 @@ CombineChars(
 	   have string length */
 
 	/* be pessimistic, assume all characters are decomposed */
-	dest = (unsigned short *)safemalloc(
-		(str_len + 1) * 2 * sizeof(unsigned short));
+	dest = xmalloc((str_len + 1) * 2 * sizeof(unsigned short));
 	/* use theese to keep track of the mapping of characters from
 	   logical to visual */
-	source_v_to_l = (int *)safemalloc(str_len * sizeof(int));
-	dest_v_to_l = (int *)safemalloc(str_len * 2 * sizeof(int));
+	source_v_to_l = xmalloc(str_len * sizeof(int));
+	dest_v_to_l = xmalloc(str_len * 2 * sizeof(int));
 	/* setup initial mapping 1-to-1 */
 	for(i = 0 ; i < str_len ; i++)
 	{
@@ -1963,9 +1960,8 @@ CombineChars(
 		source = dest;
 		source_v_to_l = dest_v_to_l;
 		str_len = j;
-		dest = (unsigned short *)safemalloc(
-			(str_len + 1) * 2 * sizeof(unsigned short));
-		dest_v_to_l = (int *)safemalloc(str_len * 2 * sizeof(int));
+		dest = xmalloc((str_len + 1) * 2 * sizeof(unsigned short));
+		dest_v_to_l = xmalloc(str_len * 2 * sizeof(int));
 	} while (has_changed);
 	/* source now holds decomposed string (got swapped before exiting
 	   loop, str_len holds string length */
@@ -2070,9 +2066,8 @@ CombineChars(
 			}
 		}
 		/* allocate storage for combining characters */
-		*comb_chars = (superimpose_char_t *)
-			safemalloc((comp_str_len + 1) *
-				   sizeof(superimpose_char_t));
+		*comb_chars = xmalloc((comp_str_len + 1) *
+				sizeof(superimpose_char_t));
 	}
 	for (i = 0,j = 0,k = 0 ; i < str_len ; i++)
 	{
@@ -2112,7 +2107,7 @@ CombineChars(
 
 	if(l_to_v != NULL)
 	{
-		*l_to_v = (int *)safemalloc((in_str_len + 1) * sizeof(int));
+		*l_to_v = xmalloc((in_str_len + 1) * sizeof(int));
 		/* map the visual to logical mapping obtained above into
 		   a logical to visual mapping */
 		/* setup the final mapping from logical to visual positions */

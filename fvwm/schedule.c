@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -133,10 +132,9 @@ static void schedule(
 		return;
 	}
 	/* create the new object */
-	new_obj = (sq_object_type *)safemalloc(sizeof(sq_object_type));
-	memset(new_obj, 0, sizeof(sq_object_type));
+	new_obj = xcalloc(1, sizeof(sq_object_type));
 	new_obj->window = window;
-	new_obj->command = safestrdup(command);
+	new_obj->command = xstrdup(command);
 	new_obj->time_to_execute = time_to_execute;
 	new_obj->period = period; /* 0 if this is not a periodic command */
 	/* set the job group id */
@@ -196,7 +194,7 @@ static void execute_obj_func(void *object, void *args)
 	if (obj->period > 0)
 	{
 		/* This is a periodic function, so reschedule it. */
-		sq_object_type *new_obj = (sq_object_type *)safemalloc(sizeof(sq_object_type));
+		sq_object_type *new_obj = xmalloc(sizeof(sq_object_type));
 		memcpy(new_obj, obj, sizeof(sq_object_type));
 		obj->command = NULL; /* new_obj->command now points to cmd. */
 		new_obj->time_to_execute = fev_get_evtime() + new_obj->period;

@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -98,7 +97,7 @@ const exec_context_t *exc_create_null_context(void)
 	int i;
 #endif
 
-	exc = (exec_context_t *)safecalloc(1, sizeof(exec_context_t));
+	exc = xcalloc(1, sizeof(exec_context_t));
 #ifdef DEBUG_EXECCONTEXT
 fprintf(stderr, "xxx+0 ");
 for(i=0;i<nx;i++)fprintf(stderr,"  ");
@@ -137,7 +136,7 @@ const exec_context_t *exc_clone_context(
 int i;
 #endif
 
-	exc = (exec_context_t *)safemalloc(sizeof(exec_context_t));
+	exc = xmalloc(sizeof(exec_context_t));
 #ifdef DEBUG_EXECCONTEXT
 fprintf(stderr, "xxx+= ");
 for(i=0;i<nx;i++)fprintf(stderr,"  ");

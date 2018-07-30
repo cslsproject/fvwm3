@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -115,7 +114,7 @@ char *charmap_table_to_string(int mask, charmap_t *table)
 
 	c[1] = 0;
 	modmask = mask;
-	allmods = safemalloc(sizeof(table->value) * 8 + 1);
+	allmods = xmalloc(sizeof(table->value) * 8 + 1);
 	*allmods = 0;
 	for (; table->key !=0; table++)
 	{

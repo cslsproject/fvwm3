@@ -10,17 +10,9 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
-/*
- * This module is all new
- * by Rob Nation
- * A little of it is borrowed from ctwm.
- * Copyright 1993 Robert Nation. No restrictions are placed on this code,
- * as long as the copyright notice is preserved
- */
 /*
  *
  * fvwm window-list popup code
@@ -86,12 +78,14 @@ static char *get_desk_title(int desk, unsigned long flags, Bool is_top_title)
 	desk_name = GetDesktopName(desk);
 	if (desk_name != NULL)
 	{
-		tlabel = (char *)safemalloc(strlen(desk_name)+50);
+		tlabel = xmalloc(strlen(desk_name)+50);
 	}
 	else
 	{
-		tlabel = (char *)safemalloc(50);
+		tlabel = xmalloc(50);
 	}
+
+	/* TA:  FIXME! xasprintf() */
 
 	if (desk_name != NULL)
 	{
@@ -560,7 +554,7 @@ void CMD_WindowList(F_CMD_ARGS)
 			}
 			else if (!opts || !*opts)
 			{
-				default_action = safestrdup(tok);
+				default_action = xstrdup(tok);
 			}
 			else
 			{
@@ -861,7 +855,7 @@ void CMD_WindowList(F_CMD_ARGS)
 				free_name = True;
 			}
 
-			t_hot = safemalloc(strlen(name) + 80);
+			t_hot = xmalloc(strlen(name) + 80);
 			if (use_hotkey)
 			{
 				/* Generate label */
@@ -1015,9 +1009,11 @@ void CMD_WindowList(F_CMD_ARGS)
 				strcat(t_hot,tname);
 			}
 			ffunc = func ? func : "WindowListFunc";
-			tfunc = safemalloc(strlen(ffunc) + 36);
+			tfunc = xmalloc(strlen(ffunc) + 36);
 			/* support two ways for now: window context
 			 * (new) and window id param (old) */
+			
+			/* TA:  FIXME!  xasprintf() */
 			sprintf(tfunc, "WindowId %lu %s %lu",
 				FW_W(t), ffunc, FW_W(t));
 			AddToMenu(

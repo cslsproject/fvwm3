@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -237,7 +236,8 @@ void CMD_WindowShadeAnimate(F_CMD_ARGS)
 		ERR, "CMD_WindowShadeAnimate",
 		"The WindowShadeAnimate command is obsolete. "
 		"Please use 'Style * WindowShadeSteps %s' instead.", action);
-	buf = safemalloc(strlen(action) + 32);
+	/* TA:  FIXME!  xasprintf() */
+	buf = xmalloc(strlen(action) + 32);
 	sprintf(buf, "* WindowShadeSteps %s", action);
 	action = buf;
 	CMD_Style(F_PASS_ARGS);

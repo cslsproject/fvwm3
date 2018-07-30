@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -49,7 +48,7 @@ char *CatString3(const char *a, const char *b, const char *c)
 	if (len > buffer_len)
 	{
 		buffer_len = CHUNK_SIZE * (1 + ((len - 1) / CHUNK_SIZE));
-		buffer = saferealloc(buffer, buffer_len);
+		buffer = xrealloc(buffer, buffer_len, buffer_len);
 	}
 	buffer[0] = 0;
 	if (a != NULL)
@@ -108,7 +107,8 @@ void CopyString(char **dest, const char *source)
 		source--;
 	}
 
-	*dest = safemalloc(len+1);
+	/* TA:  FIXME!  xasprintf() */
+	*dest = xmalloc(len+1);
 	strncpy(*dest,start,len);
 	(*dest)[len]=0;
 }
@@ -169,7 +169,8 @@ char *stripcpy( const char *source )
 		tmp--;
 		len--;
 	}
-	ptr = safemalloc(len+1);
+	/* TA:  FIXME!  xasprintf() */
+	ptr = xmalloc(len+1);
 	if (len)
 	{
 		strncpy(ptr,source,len);

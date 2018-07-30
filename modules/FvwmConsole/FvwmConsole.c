@@ -19,8 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* FIXME: The signal handling of this module is largely broken */
@@ -113,7 +112,7 @@ int main(int argc, char *argv[])
 	/* construct client's name */
 	strcpy(client, argv[0]);
 	strcat(client, "C");
-	eargv =(char **)safemalloc((argc+12)*sizeof(char *));
+	eargv = xmalloc((argc+12)*sizeof(char *));
 	/* copy arguments */
 	eargv[0] = XTERM;
 	j = 1;
@@ -208,7 +207,7 @@ void server(void)
 
 	/* name the socket */
 	home = getenv("FVWM_USERDIR");
-	S_name = safemalloc(strlen(home) + sizeof(S_NAME) + 1);
+	S_name = xmalloc(strlen(home) + sizeof(S_NAME) + 1);
 	strcpy(S_name, home);
 	strcat(S_name, S_NAME);
 

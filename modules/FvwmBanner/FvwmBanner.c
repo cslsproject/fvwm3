@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -122,7 +121,7 @@ int main(int argc, char **argv)
   if (string != (char *) 0) string++;
 
   MyNameLen=strlen(string)+1;           /* account for '*' */
-  MyName = safemalloc(MyNameLen+1);     /* account for \0 */
+  MyName = xmalloc(MyNameLen + 1);     /* account for \0 */
   *MyName='*';
   strcpy (MyName+1, string);
 
@@ -141,7 +140,7 @@ int main(int argc, char **argv)
   }
 
   if (argc > 6) {
-    imageName = safemalloc (strlen (argv[6]) + 1);
+    imageName = xmalloc(strlen(argv[6]) + 1);
     strcpy (imageName, argv[6]);
   }
 

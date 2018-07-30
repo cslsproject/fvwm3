@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* FIXME: The signal handling of this module is largely broken */
@@ -92,7 +91,7 @@ int main(int argc, char *argv[])
 
 	/* make a socket */
 	home = getenv("FVWM_USERDIR");
-	s_name = safemalloc(strlen(home) + sizeof(S_NAME) + 1);
+	s_name = xmalloc(strlen(home) + sizeof(S_NAME) + 1);
 	strcpy(s_name, home);
 	strcat(s_name, S_NAME);
 	s = socket(AF_UNIX, SOCK_STREAM, 0);

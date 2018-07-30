@@ -19,8 +19,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -245,7 +244,7 @@ static void add_to_junk(Pixmap pixmap)
 {
 	struct junklist *oldjunk = junk;
 
-	junk = (struct junklist *)safemalloc(sizeof(struct junklist));
+	junk = xmalloc(sizeof(struct junklist));
 	junk->prev = oldjunk;
 	junk->pixmap = pixmap;
 	if (!cleanup_scheduled)
@@ -1147,7 +1146,7 @@ void parse_colorset(int n, char *line)
 			/* Note: this may allocate a lot of memory:
 			 * cs->width * cs->height * 12 and then the rest of the
 			 * procedure can take a lot of times */
-			colors = (XColor *)safemalloc(
+			colors = xmalloc(
 				cs->width * cs->height * sizeof(XColor));
 			/* get the pixmap and mask into an image */
 			image = XGetImage(
@@ -1699,8 +1698,8 @@ void alloc_colorset(int n)
 	}
 	else
 	{
-		Colorset = (colorset_t *)saferealloc(
-			(char *)Colorset, (n + 1) * sizeof(colorset_t));
+		Colorset = xrealloc(
+			(void *)Colorset, (n + 1), sizeof(colorset_t));
 		memset(
 			&Colorset[nColorsets], 0,
 			(n + 1 - nColorsets) * sizeof(colorset_t));

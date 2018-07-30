@@ -3,11 +3,6 @@
  * interfacing this module to the Window Manager, are all original work
  * by Robert Nation
  *
- * Copyright 1994, Robert Nation. No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact.
- *
  * reworked by A.Kadlec (albrecht@auto.tuwien.ac.at) 09/96
  * to support an arbitrary enter_fn & leave_fn (command line arguments)
  * completely reworked, while I was there.
@@ -29,8 +24,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -266,7 +260,7 @@ main(int argc, char **argv)
 			token = PeekToken(enter_fn, NULL);
 			if (!StrEquals(token, "Silent"))
 			{
-				enter_fn = safestrdup(
+				enter_fn = xstrdup(
 					CatString2("Silent ", enter_fn));
 			}
 		}
@@ -289,7 +283,7 @@ main(int argc, char **argv)
 			token = PeekToken(leave_fn, NULL);
 			if (!StrEquals(token, "Silent"))
 			{
-				leave_fn = safestrdup(
+				leave_fn = xstrdup(
 					CatString2("Silent ", leave_fn));
 			}
 		}
@@ -350,7 +344,7 @@ main(int argc, char **argv)
 	{
 		len += 32;
 	}
-	buf = safemalloc(len);
+	buf = xmalloc(len);
 
 	while (!isTerminated)
 	{

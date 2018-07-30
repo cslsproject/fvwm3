@@ -11,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -369,7 +368,7 @@ void ewmh_ChangeProperty(
 		    format == 32 && asize * 8 != format &&
 		    strcmp(atom_name, "_NET_WM_ICON") == 0)
 		{
-			long *datacopy = (long*)safemalloc(asize * length);
+			long *datacopy = xmalloc(asize * length);
 			int i;
 
 			for (i = 0; i < length; i++)
@@ -427,7 +426,7 @@ void *atom_get(Window win, Atom to_get, Atom type, int *size)
 		int asize;
 
 		asize = atom_size(format_ret);
-		data = safemalloc(num_ret * asize);
+		data = xmalloc(num_ret * asize);
 		if (format_ret == 32 && asize * 8 != format_ret)
 		{
 			int i;
@@ -670,7 +669,7 @@ void add_kst_item(Window w)
 		prev = &(t->next);
 		t = t->next;
 	}
-	*prev = (KstItem *)safemalloc(sizeof(KstItem));
+	*prev = xmalloc(sizeof(KstItem));
 	(*prev)->w = w;
 	(*prev)->next = NULL;
 
@@ -718,7 +717,7 @@ void set_kde_sys_tray(void)
 
 	if (nbr > 0)
 	{
-		wins = (Window *)safemalloc(sizeof(Window) * nbr);
+		wins = xmalloc(sizeof(Window) * nbr);
 	}
 
 	t = ewmh_KstWinList;
@@ -881,7 +880,7 @@ void EWMH_SetClientList(void)
 	}
 	if (nbr != 0)
 	{
-		wl = (Window *)safemalloc(sizeof(Window) * nbr);
+		wl = xmalloc(sizeof(Window) * nbr);
 		for (fw = Scr.FvwmRoot.next; fw != NULL; fw = fw->next)
 		{
 			wl[i++] = FW_W(fw);
@@ -914,7 +913,7 @@ void EWMH_SetClientListStacking(void)
 	i = nbr-1;
 	if (nbr != 0)
 	{
-		wl = (Window *)safemalloc(sizeof(Window) * nbr);
+		wl = xmalloc(sizeof(Window) * nbr);
 		for (
 			fw = Scr.FvwmRoot.stack_next; fw != &Scr.FvwmRoot;
 			fw = fw->stack_next)
@@ -1791,7 +1790,7 @@ void set_net_supported(int l)
 	Atom *supported;
 	int i, k = 0;
 
-	supported = (Atom *)safemalloc(l*sizeof(Atom));
+	supported = xmalloc(l*sizeof(Atom));
 	for(i=0; i < NUMBER_OF_ATOM_LISTS; i++)
 	{
 		ewmh_atom *list = atom_list[i].list;

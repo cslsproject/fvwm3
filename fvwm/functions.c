@@ -10,15 +10,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
-
-/* This module is all original code
- * by Rob Nation
- * Copyright 1993, Robert Nation
- *     You may use this code for any purpose, as long as the original
- *     copyright remains in the source code and all documentation */
 
 /*
  * fvwm built-in functions and complex functions
@@ -89,6 +82,7 @@ typedef struct FvwmFunction
 typedef enum
 {
 	CF_IMMEDIATE =      'i',
+	CF_LATE_IMMEDIATE = 'j',
 	CF_MOTION =         'm',
 	CF_HOLD =           'h',
 	CF_CLICK =          'c',
@@ -327,7 +321,7 @@ static const func_t *find_builtin_function(char *func)
 		return &(func_table[0]);
 	}
 
-	temp = safestrdup(func);
+	temp = xstrdup(func);
 	for (s = temp; *s != 0; s++)
 	{
 		if (isupper(*s))
@@ -896,6 +890,8 @@ static void execute_complex_function(
 	Bool HaveHold = False;
 	Bool NeedsTarget = False;
 	Bool ImmediateNeedsTarget = False;
+	int has_immediate = 0;
+	int do_run_late_immediate = 0;
 	int do_allow_unmanaged = FUNC_ALLOW_UNMANAGED;
 	int do_allow_unmanaged_immediate = FUNC_ALLOW_UNMANAGED;
 	char *arguments[11], *taction;
@@ -948,7 +944,7 @@ static void execute_complex_function(
 	/* duplicate the whole argument list for use as '$*' */
 	if (taction)
 	{
-		arguments[0] = safestrdup(taction);
+		arguments[0] = xstrdup(taction);
 		/* strip trailing newline */
 		if (arguments[0][0])
 		{
@@ -987,6 +983,10 @@ static void execute_complex_function(
 
 	for (fi = func->first_item; fi != NULL; fi = fi->next_item)
 	{
+		if (fi->condition == CF_IMMEDIATE)
+		{
+			has_immediate = 1;
+		}
 		if (fi->flags & FUNC_NEEDS_WINDOW)
 		{
 			NeedsTarget = True;
@@ -995,7 +995,6 @@ static void execute_complex_function(
 			{
 				do_allow_unmanaged_immediate &= fi->flags;
 				ImmediateNeedsTarget = True;
-				break;
 			}
 		}
 	}
@@ -1031,11 +1030,14 @@ static void execute_complex_function(
 		__cf_cleanup(&depth, arguments, cond_rc);
 		return;
 	}
-	exc2 = exc_clone_context(exc, &ecc, mask);
-	__run_complex_function_items(
-		cond_rc, CF_IMMEDIATE, func, exc2, arguments,
-		has_ref_window_moved);
-	exc_destroy_context(exc2);
+	if (has_immediate)
+	{
+		exc2 = exc_clone_context(exc, &ecc, mask);
+		__run_complex_function_items(
+			cond_rc, CF_IMMEDIATE, func, exc2, arguments,
+			has_ref_window_moved);
+		exc_destroy_context(exc2);
+	}
 	for (fi = func->first_item;
 	     fi != NULL && cond_rc->break_levels == 0;
 	     fi = fi->next_item)
@@ -1045,6 +1047,9 @@ static void execute_complex_function(
 		switch (c)
 		{
 		case CF_IMMEDIATE:
+			break;
+		case CF_LATE_IMMEDIATE:
+			do_run_late_immediate = 1;
 			break;
 		case CF_DOUBLE_CLICK:
 			HaveDoubleClick = True;
@@ -1111,6 +1116,15 @@ static void execute_complex_function(
 	/* Wait and see if we have a click, or a move */
 	/* wait forever, see if the user releases the button */
 	type = CheckActionType(x, y, &d, HaveHold, True, &button);
+	if (do_run_late_immediate)
+	{
+		exc2 = exc_clone_context(exc, &ecc, mask);
+		__run_complex_function_items(
+			cond_rc, CF_LATE_IMMEDIATE, func, exc2, arguments,
+			has_ref_window_moved);
+		exc_destroy_context(exc2);
+		do_run_late_immediate = 0;
+	}
 	if (type == CF_CLICK)
 	{
 		int button2;
@@ -1175,6 +1189,12 @@ static void execute_complex_function(
 	ecc.w.w = (ecc.w.fw) ? FW_W_FRAME(ecc.w.fw) : None;
 	mask |= ECC_ETRIGGER | ECC_W;
 	exc2 = exc_clone_context(exc, &ecc, mask);
+	if (do_run_late_immediate)
+	{
+		__run_complex_function_items(
+			cond_rc, CF_LATE_IMMEDIATE, func, exc2, arguments,
+			has_ref_window_moved);
+	}
 	__run_complex_function_items(
 		cond_rc, type, func, exc2, arguments, has_ref_window_moved);
 	exc_destroy_context(exc2);
@@ -1194,7 +1214,7 @@ static FvwmFunction *NewFvwmFunction(const char *name)
 {
 	FvwmFunction *tmp;
 
-	tmp = (FvwmFunction *)safemalloc(sizeof(FvwmFunction));
+	tmp = xmalloc(sizeof *tmp);
 	tmp->next_func = Scr.functions;
 	tmp->first_item = NULL;
 	tmp->last_item = NULL;
@@ -1409,6 +1429,7 @@ void AddToFunction(FvwmFunction *func, char *action)
 	if (isupper(condition))
 		condition = tolower(condition);
 	if (condition != CF_IMMEDIATE &&
+	    condition != CF_LATE_IMMEDIATE &&
 	    condition != CF_MOTION &&
 	    condition != CF_HOLD &&
 	    condition != CF_CLICK &&
@@ -1443,7 +1464,7 @@ void AddToFunction(FvwmFunction *func, char *action)
 		return;
 	}
 
-	tmp = (FunctionItem *)safemalloc(sizeof(FunctionItem));
+	tmp = xmalloc(sizeof *tmp);
 	tmp->next_item = NULL;
 	tmp->func = func;
 	if (func->first_item == NULL)

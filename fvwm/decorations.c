@@ -10,16 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-/*
- *
- * This is all original code by Robert Nation
- * which reads motif mwm window manager
- * hints from a window, and makes necessary adjustments for fvwm.
- *
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */

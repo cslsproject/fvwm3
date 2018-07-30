@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307	 USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 /* This module is based on Twm, but has been siginificantly modified
  * by Rob Nation
@@ -423,7 +422,7 @@ static void setup_window_structure(
 	*/
 	if (ReuseWin == NULL)
 	{
-		*pfw = (FvwmWindow *)safemalloc(sizeof(FvwmWindow));
+		*pfw = xmalloc(sizeof(FvwmWindow));
 	}
 	else
 	{
@@ -565,8 +564,8 @@ static void setup_name_count(FvwmWindow *fw, Bool is_icon)
 	return;
 }
 
-static char *interpolate_titleformat_name(FvwmWindow *fw, window_style *style,
-		Bool is_icon)
+static char *interpolate_titleformat_name(
+	int *ret_bits, FvwmWindow *fw, window_style *style, Bool is_icon)
 {
 	char stringbuf[MAX_VISIBLE_NAME_LEN] = "";
 
@@ -582,12 +581,15 @@ static char *interpolate_titleformat_name(FvwmWindow *fw, window_style *style,
 	char win_name_len[MAX_WINDOW_NAME_NUMBER_DIGITS+1];
 	char w_id[12];
 
+	*ret_bits = 0;
 	if (is_icon)
 	{
 		format = (style->flags.has_icon_title_format_string) ?
 			SGET_ICON_TITLE_FORMAT_STRING(*style) :
-			DEFAULT_TITLE_FORMAT;
-	} else {
+			DEFAULT_ICON_TITLE_FORMAT;
+	}
+	else
+	{
 		format = (style->flags.has_title_format_string) ?
 			SGET_TITLE_FORMAT_STRING(*style) :
 			DEFAULT_TITLE_FORMAT;
@@ -596,7 +598,11 @@ static char *interpolate_titleformat_name(FvwmWindow *fw, window_style *style,
 	while (*format)
 	{
 		int pos;
-		for (pos = 0; format[pos] && format[pos] != '%'; pos++);
+
+		for (pos = 0; format[pos] && format[pos] != '%'; pos++)
+		{
+			/* nothing */
+		}
 
 		strncat(stringbuf, format, pos);
 		format += pos;
@@ -608,6 +614,8 @@ static char *interpolate_titleformat_name(FvwmWindow *fw, window_style *style,
 		switch (*format)
 		{
 			case 'n':
+				/* format contains the window name */
+				*ret_bits |= 1;
 				if (strlen(stringbuf) +
 					strlen(fw->name.name) >
 					MAX_VISIBLE_NAME_LEN)
@@ -637,6 +645,8 @@ static char *interpolate_titleformat_name(FvwmWindow *fw, window_style *style,
 				strcat(stringbuf, fw->class.res_class);
 				break;
 			case 'i':
+				/* format contains icon name */
+				*ret_bits |= 2;
 				/* Not every application will have an icon
 				 * name set; don't crash trying to dereference
 				 * this if the name doesn't exist.
@@ -1412,8 +1422,24 @@ static void destroy_auxiliary_windows(
 	return;
 }
 
+static void broadcast_window_names(FvwmWindow *fw, int changed_names)
+{
+	if (changed_names & 1)
+	{
+		EWMH_SetVisibleName(fw, False);
+		BroadcastWindowIconNames(fw, True, False);
+	}
+	if (changed_names & 2)
+	{
+		EWMH_SetVisibleName(fw, True);
+		BroadcastWindowIconNames(fw, False, True);
+	}
+}
+
 static void setup_icon(FvwmWindow *fw, window_style *pstyle)
 {
+	int affected_titles;
+
 	increase_icon_hint_count(fw);
 	/* find a suitable icon pixmap */
 	if ((fw->wmhints) && (fw->wmhints->flags & IconWindowHint))
@@ -1474,16 +1500,13 @@ static void setup_icon(FvwmWindow *fw, window_style *pstyle)
 		fw->icon_name.name = fw->name.name;
 		SET_WAS_ICON_NAME_PROVIDED(fw, 0);
 	}
-	setup_visible_name(fw, True);
-
+	affected_titles = setup_visible_names(fw, 2);
 
 	/* wait until the window is iconified and the icon window is mapped
 	 * before creating the icon window
 	 */
 	FW_W_ICON_TITLE(fw) = None;
-
-	EWMH_SetVisibleName(fw, True);
-	BroadcastWindowIconNames(fw, False, True);
+	broadcast_window_names(fw, affected_titles);
 	if (fw->icon_bitmap_file != NULL &&
 	    fw->icon_bitmap_file != Scr.DefaultIcon)
 	{
@@ -1692,8 +1715,7 @@ static void __add_window_handle_x_resources(FvwmWindow *fw)
 			name_len--;
 		}
 		if (name_len>0) {
-			fw->style_name = (char*)safemalloc(sizeof(char)*
-							   (name_len+1));
+			fw->style_name = xmalloc(sizeof(char) * (name_len+1));
 			memcpy(fw->style_name,style_name,name_len);
 			fw->style_name[name_len] = 0;
 		}
@@ -1768,31 +1790,102 @@ static int is_geometry_invalid_with_hints(
 
 /* ---------------------------- interface functions ------------------------ */
 
-void setup_visible_name(FvwmWindow *fw, Bool is_icon)
+/* what_changed:
+ *  1 = title name
+ *  2 = icon name
+ *  3 = both
+ *  4 = title format style
+ *  8 = icon title format style
+ *
+ * Returns which titles need to be updated (like what_changed).  The return
+ * value can be used as the 'which' argument of update_window_names.
+ */
+int setup_visible_names(FvwmWindow *fw, int what_changed)
 {
 	char *ext_name;
 	window_style style;
+	int affected_titles;
+	int changed_names;
+	int changed_styles;
+	int force_update;
+	int bits;
 
 	if (fw == NULL)
 	{
 		/* should never happen */
-		return;
+		return 0;
 	}
 
+	changed_names = (what_changed & 3);
+	changed_styles = ((what_changed >> 2) & 3);
+	force_update = changed_styles;
+	if (fw->visible_name == NULL)
+	{
+		force_update |= 1;
+	}
+	if (fw->visible_icon_name == NULL)
+	{
+		force_update |= 2;
+	}
+	affected_titles = 0;
+	affected_titles |= changed_styles;
 	/* TA:  Get the window style. */
 	lookup_style(fw, &style);
-	ext_name = interpolate_titleformat_name(fw, &style, is_icon);
-
-	if (is_icon)
+	if (changed_names != 0 || (force_update & 1))
 	{
-		fw->visible_icon_name = strdup(ext_name);
+		ext_name = interpolate_titleformat_name(
+			&bits, fw, &style, False);
+		if ((changed_names & bits) || (force_update & 1))
+		{
+			fw->visible_name = ext_name;
+			affected_titles |= 1;
+		}
+		else
+		{
+			free(ext_name);
+		}
 	}
-	else
+	if (changed_names != 0 || (force_update & 2))
 	{
-		fw->visible_name = strdup(ext_name);
+		ext_name = interpolate_titleformat_name(
+			&bits, fw, &style, True);
+		if ((changed_names & bits) || (force_update & 2))
+		{
+			fw->visible_icon_name = ext_name;
+			affected_titles |= 2;
+		}
+		else
+		{
+			free(ext_name);
+		}
 	}
 
-	free(ext_name);
+	return (changed_styles) ? changed_styles : affected_titles;
+}
+
+/* changed_names:
+ *   1 = title
+ *   2 = icon
+ *   3 = both
+ */
+void update_window_names(FvwmWindow *fw, int changed_names)
+{
+	int affected_titles;
+
+	affected_titles = setup_visible_names(fw, changed_names);
+	affected_titles |= changed_names;
+	/* fix the name in the title bar */
+	if (!IS_ICONIFIED(fw))
+	{
+		border_draw_decorations(
+			fw, PART_TITLE, (Scr.Hilite == fw), True, CLEAR_ALL,
+			NULL, NULL);
+	}
+	broadcast_window_names(fw, affected_titles);
+	if (affected_titles & 2)
+	{
+		RedoIconName(fw);
+	}
 
 	return;
 }
@@ -2351,7 +2444,7 @@ FvwmWindow *AddWindow(
 	setup_icon_font(fw, &style, False);
 
 	/***** visible window name ****/
-	setup_visible_name(fw, False);
+	setup_visible_names(fw, 1);
 	EWMH_SetVisibleName(fw, False);
 	if (Scr.bo.do_display_new_window_names)
 	{
@@ -2819,7 +2912,7 @@ void GetWindowSizeHintsWithCheck(
 	int do_reject_invalid_size_constraints_on_existing_window)
 {
 	long supplied = 0;
-	char *broken_cause ="";
+	char *broken_cause = 0;
 	XSizeHints orig_hints;
 	XSizeHints new_hints;
 	Status rc;
@@ -2873,7 +2966,7 @@ void GetWindowSizeHintsWithCheck(
 			     (new_hints.flags & PMaxSize) &&
 			     new_hints.min_height != new_hints.max_height))
 			{
-				if (!*broken_cause)
+				if (!broken_cause)
 				{
 					broken_cause = "height_inc";
 				}
@@ -2891,11 +2984,11 @@ void GetWindowSizeHintsWithCheck(
 
 	if (new_hints.flags & PMinSize)
 	{
-		if (new_hints.min_width < 0 && !*broken_cause)
+		if (new_hints.min_width < 0 && !broken_cause)
 		{
 			broken_cause = "min_width";
 		}
-		if (new_hints.min_height < 0 && !*broken_cause)
+		if (new_hints.min_height < 0 && !broken_cause)
 		{
 			broken_cause = "min_height";
 		}
@@ -2927,7 +3020,7 @@ void GetWindowSizeHintsWithCheck(
 		if (new_hints.max_width < new_hints.min_width)
 		{
 			new_hints.max_width = DEFAULT_MAX_MAX_WINDOW_WIDTH;
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "max_width";
 			}
@@ -2935,7 +3028,7 @@ void GetWindowSizeHintsWithCheck(
 		if (new_hints.max_height < new_hints.min_height)
 		{
 			new_hints.max_height = DEFAULT_MAX_MAX_WINDOW_HEIGHT;
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "max_height";
 			}
@@ -2957,7 +3050,7 @@ void GetWindowSizeHintsWithCheck(
 		if (new_hints.base_width < 0)
 		{
 			new_hints.base_width = 0;
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "base_width";
 			}
@@ -2965,7 +3058,7 @@ void GetWindowSizeHintsWithCheck(
 		if (new_hints.base_height < 0)
 		{
 			new_hints.base_height = 0;
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "base_height";
 			}
@@ -2984,7 +3077,7 @@ void GetWindowSizeHintsWithCheck(
 #if 0
 			/* Keep silent about this, since the Xlib manual
 			 * actually recommends making min <= base <= max ! */
-			broken_cause = "";
+			broken_cause = 0;
 #endif
 		}
 	}
@@ -3013,7 +3106,7 @@ void GetWindowSizeHintsWithCheck(
 		if (new_hints.max_width < new_hints.base_width)
 		{
 			new_hints.max_width = DEFAULT_MAX_MAX_WINDOW_WIDTH;
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "max_width";
 			}
@@ -3021,7 +3114,7 @@ void GetWindowSizeHintsWithCheck(
 		if (new_hints.max_height < new_hints.base_height)
 		{
 			new_hints.max_height = DEFAULT_MAX_MAX_WINDOW_HEIGHT;
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "max_height";
 			}
@@ -3065,7 +3158,7 @@ void GetWindowSizeHintsWithCheck(
 		    (((double)minAspectX * (double)maxAspectY) >
 		     ((double)maxAspectX * (double)minAspectY)))
 		{
-			if (!*broken_cause)
+			if (!broken_cause)
 			{
 				broken_cause = "aspect ratio";
 			}
@@ -3145,8 +3238,8 @@ void GetWindowSizeHintsWithCheck(
 				" invalid.  The new hints will become active"
 				" when the window generates the next"
 				" ConfigureRequest.\n", is_invalid);
+			broken_cause = "inconsistent with current size";
 		}
-		broken_cause = "";
 	}
 	else
 	{
@@ -3154,7 +3247,7 @@ void GetWindowSizeHintsWithCheck(
 		fw->orig_hints.width_inc = orig_hints.width_inc;
 		fw->orig_hints.height_inc = orig_hints.height_inc;
 	}
-	if (*broken_cause != 0)
+	if (broken_cause != 0)
 	{
 		fvwm_msg(
 			WARN, "GetWindowSizeHints",

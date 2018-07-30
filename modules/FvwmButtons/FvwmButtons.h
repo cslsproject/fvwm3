@@ -5,12 +5,6 @@
  * This module, and the entire GoodStuff program, and the concept for
  * interfacing this module to the Window Manager, are all original work
  * by Robert Nation
- *
- * Copyright 1993, Robert Nation. No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact.
- *
  */
 
 /* -------------------------------- DEBUG ---------------------------------- */
@@ -238,11 +232,6 @@ struct button_info_struct
 void AddButtonAction(button_info*, int, char*);
 void MakeContainer(button_info*);
 void change_swallowed_window_colorset(button_info *b, Bool do_clear);
-#ifdef DEBUG
-char *mymalloc(int);
-#else
-#define mymalloc(a) safemalloc(a)
-#endif
 void handle_xinerama_string(char *args);
 int LoadIconFile(const char *s, FvwmPicture **p, int cset);
 void SetTransparentBackground(button_info *ub, int w, int h);

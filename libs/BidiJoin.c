@@ -11,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -145,14 +144,6 @@ static const char_shaped_t shaped_table[] =
 	{ 0xFEFB, 0xFEFB, 0x0000, 0x0000, 0xFEFC, }, /* LAM_ALEF */
 };
 
-static const char_shaped_comb_t shaped_comb_table[] =
-{
-	{ 0x0644, 0x0622, 0xFEF5, 0xFEF6, }, /* LAM_ALEF_MADDA */
-	{ 0x0644, 0x0623, 0xFEF7, 0xFEF8, }, /* LAM_ALEF_HAMZA_ABOVE */
-	{ 0x0644, 0x0625, 0xFEF9, 0xFEFA, }, /* LAM_ALEF_HAMZA_BELOW */
-	{ 0x0644, 0x0627, 0xFEFB, 0xFEFC, }, /* LAM_ALEF */
-};
-
 /* -------------------------- local functions ------------------------------ */
 
 static const char_shaped_t *
@@ -188,11 +179,9 @@ shape_n_join(
 	const char_shaped_t *curr;
 	const char_shaped_t *next;
 
-	list = (const char_shaped_t **)safemalloc(
-		(str_len + 2) * sizeof(char_shaped_t *));
+	list = xmalloc((str_len + 2) * sizeof(char_shaped_t *));
 
-	orig_str = (FriBidiChar *)safemalloc(
-		(str_len + 1) * sizeof(FriBidiChar));
+	orig_str = xmalloc((str_len + 1) * sizeof(FriBidiChar));
 
 	/* head is NULL */
 	*list = NULL;

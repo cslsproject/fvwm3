@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -45,8 +44,9 @@ int ModuleLen;
 
 static char *alloc_string(char *string)
 {
+	/* TA:  FIXME!  xasprintf() - but also, this function should die!!! */
 	int len = strlen(string);
-	char *ret = (char *)safemalloc((len + 1) * sizeof(char));
+	char *ret = xmalloc((len + 1) * sizeof(char));
 	strcpy(ret, string);
 	return ret;
 }
@@ -144,7 +144,7 @@ int allocate_managers(int num)
 	}
 
 	globals.num_managers = num;
-	globals.managers = (WinManager *)safemalloc(num * sizeof(WinManager));
+	globals.managers = xmalloc(num * sizeof(WinManager));
 
 	for (i = 0; i < num; i++) {
 		init_win_manager(i);

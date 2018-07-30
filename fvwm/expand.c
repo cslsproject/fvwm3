@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 /* ---------------------------- included header files ---------------------- */
 
@@ -446,7 +445,8 @@ static signed int expand_vars_extended(
 		if (string == NULL)
 		{
 			const char *ddn = _("Desk");
-			allocated_string = (char *)safemalloc(19 + strlen(ddn));
+			/* TA:  FIXME!  xasprintf() */
+			allocated_string = xmalloc(19 + strlen(ddn));
 			sprintf(allocated_string, "%s %i", ddn, cs);
 			string = allocated_string;
 		}
@@ -982,7 +982,7 @@ GOT_STRING:
 	}
 	if (should_quote)
 	{
-		quoted_string = (char *)safemalloc(len * 2 + 3);
+		quoted_string = xmalloc(len * 2 + 3);
 		len = QuoteString(quoted_string, string) - quoted_string;
 		if (output)
 		{
@@ -1203,7 +1203,7 @@ char *expand_vars(
 
 	/* Actually create expanded string */
 	i = 0;
-	out = safemalloc(l2 + 1);
+	out = xmalloc(l2 + 1);
 	j = 0;
 	while (i < l)
 	{

@@ -17,8 +17,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  *
  * Combined FvwmTile and FvwmCascade to FvwmRearrange module.
  * 9-Nov-1998 Dominik Vogt
@@ -188,7 +187,7 @@ int get_window(void)
     case M_CONFIGURE_WINDOW:
       if (is_suitable_window(packet->body)) {
 	window_item *wi =
-	  (window_item*)safemalloc(sizeof( window_item ));
+	  xmalloc(sizeof(window_item));
 	wi->frame = cfgpacket->frame;
 	wi->th = cfgpacket->title_height;
 	wi->bw = cfgpacket->border_width;
@@ -414,9 +413,10 @@ void parse_args(char *s, int argc, char *argv[], int argi)
     }
     else if (!strcmp(argv[argi], "-a")) {
       all = untitled = transients = maximized = 1;
-      if (FvwmCascade)
-	sticky_page = 1;
-	sticky_desk = 1;
+      if (FvwmCascade) {
+		sticky_page = 1;
+		sticky_desk = 1;
+      }
     }
     else if (!strcmp(argv[argi], "-r")) {
       reversed = 1;

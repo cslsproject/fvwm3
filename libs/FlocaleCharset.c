@@ -11,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -499,7 +498,7 @@ void FlocaleInit_X_Charset(Display *dpy, const char *module)
 				free(FLCXOMCharsetList);
 			}
 			FLCXOMCharsetList_num = cs.charset_count;
-			FLCXOMCharsetList = (FlocaleCharset **)safemalloc(
+			FLCXOMCharsetList = xmalloc(
 				sizeof(FlocaleCharset) * cs.charset_count);
 			for (i = 0; i <  FLCXOMCharsetList_num; i++)
 			{
@@ -731,7 +730,7 @@ void FlocaleCharsetSetFlocaleCharset(
 		/* the user has specified an iconv converter name and we do not
 		 * have it: must create a FlocaleCharset */
 		flf->flags.must_free_fc = True;
-		fc = (FlocaleCharset *)safemalloc(sizeof(FlocaleCharset));
+		fc = xmalloc(sizeof(FlocaleCharset));
 		if (flf->fc != NULL)
 		{
 			CopyString(&fc->x, flf->fc->x);
@@ -747,7 +746,7 @@ void FlocaleCharsetSetFlocaleCharset(
 			fc->bidi = NULL;
 			fc->encoding_type = FLC_ENCODING_TYPE_FONT;
 		}
-		fc->locale = (char **)safemalloc(2*sizeof(char *));
+		fc->locale = xmalloc(2*sizeof(char *));
 		CopyString(&fc->locale[0], iconv);
 		fc->locale[1] = NULL;
 		fc->iconv_index =  FLC_INDEX_ICONV_CHARSET_NOT_INITIALIZED;

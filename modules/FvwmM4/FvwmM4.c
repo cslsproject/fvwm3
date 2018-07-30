@@ -2,12 +2,7 @@
 /* This module, and the entire FvwmM4 program, and the concept for
  * interfacing this module to the Window Manager, are all original work
  * by Robert Nation
- *
- * Copyright 1994, Robert Nation
- *  No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact. */
+ */
 
 /* This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -119,15 +113,14 @@ int main(int argc, char **argv)
   m4path = getenv("M4PATH");
   if (m4path == NULL)
   {
-    m4path = safemalloc(sizeof("M4PATH=") + strlen(FVWM_DATADIR) + 1);
+    m4path = xmalloc(sizeof("M4PATH=") + strlen(FVWM_DATADIR) + 1);
     sprintf(m4path, "M4PATH=%s", FVWM_DATADIR);
   }
   else
   {
     char *s;
 
-    s = safemalloc(
-      sizeof("M4PATH=") + strlen(FVWM_DATADIR) + strlen(m4path) + 2);
+    s = xmalloc(sizeof("M4PATH=") + strlen(FVWM_DATADIR) + strlen(m4path) + 2);
     sprintf(s, "M4PATH=%s:%s", FVWM_DATADIR, m4path);
     m4path = s;
   }
@@ -140,7 +133,7 @@ int main(int argc, char **argv)
   if (s != NULL)
     temp = s + 1;
 
-  MyName = safemalloc(strlen(temp)+2);
+  MyName = xmalloc(strlen(temp) + 2);
   strcpy(MyName,"*");
   strcat(MyName, temp);
 
@@ -259,7 +252,7 @@ int main(int argc, char **argv)
     char *delete_file = tmp_file;
     if (tmp_file[0] != '/' && user_dir != NULL)
     {
-      delete_file = safestrdup(CatString3(user_dir, "/", tmp_file));
+      delete_file = xstrdup(CatString3(user_dir, "/", tmp_file));
     }
     delete_string = CatString3("Exec exec /bin/rm '", delete_file, "'");
     SendText(fd, delete_string, 0);
@@ -545,7 +538,7 @@ static char *MkDef(char *name, char *def)
   /* Get space to hold everything, if needed */
 
   n = EXTRA + strlen(name) + strlen(def);
-  cp = safemalloc(n);
+  cp = xmalloc(n);
 
   if (m4_prefix)
     strcpy(cp, "m4_define(");

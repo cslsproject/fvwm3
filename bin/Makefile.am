@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = fvwm-root
 fvwm_root_SOURCE= fvwm-root.c
-fvwm_root_DEPENDENCIES = $(top_builddir)/libs/libfvwm.a
+fvwm_root_DEPENDENCIES = $(top_builddir)/libs/libfvwm3.a
 
 bin_SCRIPTS = fvwm-config fvwm-bug fvwm-perllib \
 	fvwm-convert-2.6 \
@@ -15,7 +15,7 @@ man_MANS = \
 	fvwm-menu-xlock.1 fvwm-menu-directory.1 \
 	fvwm-menu-desktop.1 fvwm-menu-headlines.1
 
-LDADD = -L$(top_builddir)/libs $(X_LIBS) -lfvwm $(xpm_LIBS) $(Xcursor_LIBS) \
+LDADD = -L$(top_builddir)/libs $(X_LIBS) -lfvwm3 $(xpm_LIBS) $(Xcursor_LIBS) \
 	$(X_PRE_LIBS) -lXext -lX11 -lm $(X_EXTRA_LIBS) $(Xrender_LIBS) \
 	$(Xcursor_LIBS) $(png_LIBS) $(rsvg_LIBS) $(Xinerama_LIBS)
 AM_CPPFLAGS = -I$(top_srcdir) $(xpm_CFLAGS) $(X_CFLAGS) $(png_CFLAGS) \
@@ -70,14 +70,23 @@ regenerate: \
 
 ## Create compatibility symlinks if available
 
+xpmroot_name =`echo "xpmroot" | "$(SED)" -e "${transform}"`
+fvwm_root_name =`echo "fvwm-root" | "$(SED)" -e "${transform}"`
+
 install-exec-local:
-	@rm -f $(DESTDIR)$(bindir)/xpmroot
-	@$(LN_S) fvwm-root $(DESTDIR)$(bindir)/xpmroot || \
-		echo "Minor warning: $(bindir)/xpmroot symlink was not created"
+	@rm -f $(DESTDIR)$(bindir)/$(xpmroot_name)$(EXEEXT)
+	@$(LN_S) $(fvwm_root_name)$(EXEEXT) \
+		$(DESTDIR)$(bindir)/$(xpmroot_name)$(EXEEXT) || \
+		echo "Minor warning: $(bindir)/$(xpmroot_name)$(EXEEXT) symlink was not created"
 
 install-data-local:
-	@rm -f $(DESTDIR)$(mandir)/man1/xpmroot.1
-	@$(LN_S) fvwm-root.1 $(DESTDIR)$(mandir)/man1/xpmroot.1 || \
-		echo "Minor warning: $(mandir)/man1/xpmroot.1 symlink was not created"
+	@rm -f $(DESTDIR)$(mandir)/man1/$(xpmroot_name).1
+	@$(LN_S) $(fvwm_root_name).1 \
+		$(DESTDIR)$(mandir)/man1/$(xpmroot_name).1 || \
+		echo "Minor warning: $(mandir)/man1/$(xpmroot_name).1 symlink was not created"
+
+uninstall-local:
+	@rm -f $(DESTDIR)$(bindir)/$(xpmroot_name)$(EXEEXT)
+	@rm -f $(DESTDIR)$(mandir)/man1/$(xpmroot_name).1
 
 CLEANFILES = $(bin_SCRIPTS) $(bin_PROGRAMS)

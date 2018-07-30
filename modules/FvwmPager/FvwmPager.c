@@ -2,11 +2,7 @@
 /* This module, and the entire ModuleDebugger program, and the concept for
  * interfacing this module to the Window Manager, are all original work
  * by Robert Nation
- *
- * Copyright 1994, Robert Nation. No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact. */
+ */
 
 /* This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -262,7 +257,7 @@ int main(int argc, char **argv)
 	      (*s != '-' || s != argv[opt_num] || *(s+1) == 0))
 	  {
 	    free(MyName);
-	    MyName=safestrdup(argv[opt_num]);
+	    MyName = xstrdup(argv[opt_num]);
 	    opt_num++;
 	    break;
 	  }
@@ -297,8 +292,7 @@ int main(int argc, char **argv)
     }
   ndesks = desk2 - desk1 + 1;
 
-  Desks = (DeskInfo *)safemalloc(ndesks*sizeof(DeskInfo));
-  memset(Desks, 0, ndesks * sizeof(DeskInfo));
+  Desks = xcalloc(1, ndesks*sizeof(DeskInfo));
   for(i=0;i<ndesks;i++)
     {
       sprintf(line,"Desk %d",i+desk1);
@@ -365,28 +359,28 @@ int main(int argc, char **argv)
   }
 
   if (PagerFore == NULL)
-    PagerFore = safestrdup("black");
+    PagerFore = xstrdup("black");
 
   if (PagerBack == NULL)
-    PagerBack = safestrdup("white");
+    PagerBack = xstrdup("white");
 
   if (HilightC == NULL)
-    HilightC = safestrdup(PagerFore);
+    HilightC = xstrdup(PagerFore);
 
   if (WindowLabelFormat == NULL)
-    WindowLabelFormat = safestrdup("%i");
+    WindowLabelFormat = xstrdup("%i");
 
   if ((HilightC == NULL) && (HilightPixmap == NULL))
     HilightDesks = 0;
 
   if (BalloonBorderColor == NULL)
-    BalloonBorderColor = safestrdup("black");
+    BalloonBorderColor = xstrdup("black");
 
   if (BalloonTypeString == NULL)
-    BalloonTypeString = safestrdup("%i");
+    BalloonTypeString = xstrdup("%i");
 
   if (BalloonFormatString == NULL)
-    BalloonFormatString = safestrdup("%i");
+    BalloonFormatString = xstrdup("%i");
 
   /* open a pager window */
   initialize_pager();
@@ -675,8 +669,7 @@ void list_add(unsigned long *body)
 		t = t->next;
 		i++;
 	}
-	*prev = (PagerWindow *)safemalloc(sizeof(PagerWindow));
-	memset(*prev, 0, sizeof(PagerWindow));
+	*prev = xcalloc(1, sizeof(PagerWindow));
 	handle_config_win_package(*prev, cfgpacket);
 	AddNewWindow(*prev);
 
@@ -1278,7 +1271,7 @@ void list_restack(unsigned long *body, unsigned long length)
   Window *wins;
   int i, j, d;
 
-  wins = (Window *) safemalloc (length * sizeof (Window));
+  wins = xmalloc(length * sizeof (Window));
   /* first restack in the icon view */
   j = 0;
   for (i = 0; i < (length - FvwmPacketHeaderSize); i += 3)
@@ -1683,13 +1676,13 @@ void ParseOptions(void)
     tline2 = GetNextToken(tline2, &arg1);
     if (!arg1)
     {
-      arg1 = (char *)safemalloc(1);
+      arg1 = xmalloc(1);
       arg1[0] = 0;
     }
     tline2 = GetNextToken(tline2, &arg2);
     if (!arg2)
     {
-      arg2 = (char *)safemalloc(1);
+      arg2 = xmalloc(1);
       arg2[0] = 0;
     }
 
@@ -2222,8 +2215,7 @@ PagerStringList *NewPagerStringItem(PagerStringList *last, int desk)
 {
   PagerStringList *newitem;
 
-  newitem = (PagerStringList *)safemalloc(sizeof(PagerStringList));
-  memset(newitem, 0, sizeof(PagerStringList));
+  newitem = xcalloc(1, sizeof(PagerStringList));
   last->next = newitem;
   newitem->colorset = -1;
   newitem->highcolorset = -1;

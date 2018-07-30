@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -85,8 +84,7 @@ static void FShmSafeCreateImage(
 	{
 		return;
 	}
-	fim->shminfo = (FShmSegmentInfo *)safecalloc(
-		1, sizeof(FShmSegmentInfo));
+	fim->shminfo = xcalloc(1, sizeof(FShmSegmentInfo));
 	if (!(fim->im = FShmCreateImage(
 		dpy, visual, depth, format, NULL, fim->shminfo,
 		width, height)))
@@ -166,7 +164,7 @@ FImage *FCreateFImage (
 
 	FShmInit(dpy);
 
-	fim = (FImage *)safemalloc(sizeof(FImage));
+	fim = xmalloc(sizeof(FImage));
 	fim->im = NULL;
 	fim->shminfo = NULL;
 
@@ -182,7 +180,7 @@ FImage *FCreateFImage (
 			dpy, visual, depth, ZPixmap, 0, 0, width, height,
 			Pdepth > 16 ? 32 : (Pdepth > 8 ? 16 : 8), 0)))
 		{
-			fim->im->data = safemalloc(
+			fim->im->data = xmalloc(
 				fim->im->bytes_per_line * height);
 		}
 		else
@@ -203,7 +201,7 @@ FImage *FGetFImage(
 
 	FShmInit(dpy);
 
-	fim = (FImage *)safemalloc(sizeof(FImage));
+	fim = xmalloc(sizeof(FImage));
 	fim->im = NULL;
 	fim->shminfo = NULL;
 

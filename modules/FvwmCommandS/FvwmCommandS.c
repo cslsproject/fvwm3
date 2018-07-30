@@ -20,8 +20,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -562,11 +561,11 @@ void relay_packet(unsigned long type, unsigned long length,
   if (!body)
 	  return;
 
-  new = (Q *)safemalloc(sizeof(Q));
+  new = xmalloc(sizeof(Q));
 
   new->length = length + 2 * SOL;
   new->sent = 0L;
-  new->body = safemalloc(new->length);
+  new->body = xmalloc(new->length);
   memcpy(new->body, &type, SOL);
   memcpy(new->body + SOL, &length, SOL);
   memcpy(new->body + 2 * SOL, body, length);

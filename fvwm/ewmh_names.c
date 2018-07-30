@@ -11,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -186,10 +185,8 @@ int EWMH_WMIconName(
 		return 1;
 	}
 
-	setup_visible_name(fw, True);
-	EWMH_SetVisibleName(fw, True);
-	BroadcastWindowIconNames(fw, False, True);
-	RedoIconName(fw);
+	update_window_names(fw, 2);
+
 	return 1;
 }
 
@@ -200,6 +197,7 @@ int EWMH_WMName(
 	char *val;
 	char *tmp_str;
 	FlocaleCharset *fc = NULL;
+	int what_changed;
 
 	if (!FiconvSupport)
 		return 0;
@@ -251,27 +249,15 @@ int EWMH_WMName(
 		return 1;
 	}
 
-	setup_visible_name(fw, False);
 	SET_NAME_CHANGED(fw, 1);
-	EWMH_SetVisibleName(fw, False);
-	BroadcastWindowIconNames(fw, True, False);
-
-	/* fix the name in the title bar */
-	if (!IS_ICONIFIED(fw))
-	{
-		border_draw_decorations(
-			fw, PART_TITLE, (Scr.Hilite == fw),
-			True, CLEAR_ALL, NULL, NULL);
-	}
-
+	what_changed = 1;
 	if (!WAS_ICON_NAME_PROVIDED(fw))
 	{
 		fw->icon_name = fw->name;
-		setup_visible_name(fw, True);
-		BroadcastWindowIconNames(fw, False, True);
-		EWMH_SetVisibleName(fw, True);
-		RedoIconName(fw);
+		what_changed |= 2;
 	}
+	update_window_names(fw, what_changed);
+
 	return 0;
 }
 
@@ -310,7 +296,7 @@ void EWMH_SetDesktopNames(void)
 	{
 		return;
 	}
-	names = (void *)safemalloc(sizeof(*names)*nbr);
+	names = xmalloc(sizeof(*names)*nbr);
 	for (i = 0; i < nbr; i++)
 	{
 		names[i] = (unsigned char *)FiconvCharsetToUtf8(
@@ -325,7 +311,7 @@ void EWMH_SetDesktopNames(void)
 		}
 		s = s->next;
 	}
-	val = (unsigned char *)safemalloc(len);
+	val = xmalloc(len);
 	for (i = 0; i < nbr; i++)
 	{
 		if (names[i] != NULL)

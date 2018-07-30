@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -1734,8 +1733,7 @@ frame_move_resize_args frame_create_move_resize_args(
 	int diff;
 
 	/* set some variables */
-	mra = (mr_args_internal *)safecalloc(1, sizeof(mr_args_internal));
-	memset(mra, 0, sizeof(*mra));
+	mra = xcalloc(1, sizeof(mr_args_internal));
 	if (mr_mode & FRAME_MR_DONT_DRAW)
 	{
 		mr_mode &= ~FRAME_MR_DONT_DRAW;

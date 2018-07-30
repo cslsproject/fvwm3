@@ -11,8 +11,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -227,13 +226,14 @@ Bool MergeConfigLineResource(XrmDatabase *pdb, char *line, char *prefix,
     value++;
 
   /* prefix*suffix: value */
-  resource = (char *)safemalloc(len + (end - line) + 2);
+  /* TA:  FIXME!  xasprintf() */
+  resource = xmalloc(len + (end - line) + 2);
   strcpy(resource, prefix);
   strcat(resource, bindstr);
   strncat(resource, line, end - line);
 
   len = strlen(value);
-  myvalue = (char *)safemalloc(len + 1);
+  myvalue = xmalloc(len + 1);
   strcpy(myvalue, value);
   for (len--; len >= 0 && isspace((unsigned char)myvalue[len]); len--)
     myvalue[len] = 0;
@@ -271,8 +271,9 @@ Bool GetResourceString(
   char *Name;
   int i;
 
-  name = (char *)safemalloc(strlen(resource) + strlen(prefix) + 2);
-  Name = (char *)safemalloc(strlen(resource) + strlen(prefix) + 2);
+  /* TA:  FIXME!  xasprintf() */
+  name = xmalloc(strlen(resource) + strlen(prefix) + 2);
+  Name = xmalloc(strlen(resource) + strlen(prefix) + 2);
   strcpy(name, prefix);
   strcat(name, ".");
   strcat(name, resource);

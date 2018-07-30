@@ -5,12 +5,6 @@
  * This module, and the entire GoodStuff program, and the concept for
  * interfacing this module to the Window Manager, are all original work
  * by Robert Nation
- *
- * Copyright 1993, Robert Nation. No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact.
- *
  */
 
 /* This program is free software; you can redistribute it and/or modify
@@ -24,8 +18,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -499,8 +492,7 @@ void alloc_buttonlist(button_info *ub,int num)
     }
     while(ub->c->allocated_buttons<=num)
       ub->c->allocated_buttons+=32;
-    bb=(button_info**)
-      mymalloc(ub->c->allocated_buttons*sizeof(button_info*));
+    bb = xmalloc(ub->c->allocated_buttons*sizeof(button_info*));
     for(i=old;i<ub->c->allocated_buttons;i++)
       bb[i]=NULL;
     if(ub->c->buttons)
@@ -528,7 +520,7 @@ button_info *alloc_button(button_info *ub,int num)
     exit(2);
   }
 
-  b=(button_info*)mymalloc(sizeof(button_info));
+  b = xmalloc(sizeof(button_info));
   ub->c->buttons[num]=b;
 
   memset((void *)b, 0, sizeof(*b));
@@ -564,8 +556,7 @@ button_info *alloc_button(button_info *ub,int num)
 **/
 void MakeContainer(button_info *b)
 {
-  b->c=(container_info*)mymalloc(sizeof(container_info));
-  memset((void *)b->c, 0, sizeof(container_info));
+  b->c = xcalloc(1, sizeof(container_info));
   b->flags.b_Container = 1;
   if(b->parent != NULL)
   {
@@ -582,11 +573,11 @@ void MakeContainer(button_info *b)
     b->c->flags.b_Frame = 1;
     b->c->flags.b_Back = 1;
     b->c->flags.b_Fore = 1;
-    b->c->font_string=safestrdup("fixed");
+    b->c->font_string = xstrdup("fixed");
     b->c->xpad=2;
     b->c->ypad=4;
-    b->c->back=safestrdup("rgb:90/80/90");
-    b->c->fore=safestrdup("black");
+    b->c->back = xstrdup("rgb:90/80/90");
+    b->c->fore = xstrdup("black");
     b->c->framew=2;
   }
 
@@ -727,7 +718,7 @@ void ShuffleButtons(button_info *ub)
 
   /* make local copy of buttons in ub */
   num_items = c->num_buttons;
-  local_buttons=(button_info**)mymalloc(sizeof(button_info)*num_items);
+  local_buttons=xmalloc(sizeof(button_info)*num_items);
   for(i=0;i<num_items;i++)
   {
     local_buttons[i] = c->buttons[i];

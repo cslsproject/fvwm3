@@ -10,16 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-/*
- * This module is all original code
- * by Rob Nation
- * Copyright 1993, Robert Nation
- *     You may use this code for any purpose, as long as the original
- *     copyright remains in the source code and all documentation
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* IMPORTANT NOTE:
@@ -1768,8 +1759,7 @@ static void border_setup_bar_pixmaps(
 	}
 	else
 	{
-		dcd->bar_pixmaps[bs].bps =
-			(bar_pixmap *)safemalloc(count*sizeof(bar_pixmap));
+		dcd->bar_pixmaps[bs].bps = xmalloc(count * sizeof(bar_pixmap));
 	}
 	dcd->bar_pixmaps[bs].count = count;
 	i = 0;
@@ -5062,7 +5052,8 @@ void CMD_BorderStyle(F_CMD_ARGS)
 				return;
 			}
 			len = end - action + 1;
-			tmp = safemalloc(len);
+			/* TA:  FIXME xasprintf */
+			tmp = xmalloc(len);
 			strncpy(tmp, action, len - 1);
 			tmp[len - 1] = 0;
 			ReadDecorFace(tmp, df,-1,True);

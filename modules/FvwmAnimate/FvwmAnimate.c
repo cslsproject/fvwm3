@@ -38,8 +38,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 #include "config.h"
@@ -1138,7 +1137,7 @@ void ParseConfigLine(char *buf) {
 	if ((strcasecmp(q,"None") != 0) /* If not color "none"  */
 	    && (strcasecmp(q,"Black^White") != 0)
 	    && (strcasecmp(q,"White^Black") != 0)) {
-	  Animate.color = (char *)safestrdup(q); /* make copy of name */
+	  Animate.color = xstrdup(q); /* make copy of name */
 	}
 	/* override the pixmap option */
 	if (Animate.pixmap) {
@@ -1157,7 +1156,7 @@ void ParseConfigLine(char *buf) {
 	  Animate.pixmap = 0;          /* show its gone */
 	}
 	if (strcasecmp(q,"None") != 0) { /* If not pixmap "none"  */
-	  Animate.pixmap = (char *)safestrdup(q); /* make copy of name */
+	  Animate.pixmap = xstrdup(q); /* make copy of name */
 	}
 	if (pixmap) {
 	  XFreePixmap(dpy, pixmap);

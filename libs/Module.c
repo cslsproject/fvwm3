@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /*
@@ -403,7 +402,7 @@ char *module_expand_action(
 		r = &tmpr;
 	}
 	/* create a temporary storage for expanding */
-	action = (char *)safemalloc(MAX_MODULE_INPUT_TEXT_LEN);
+	action = xmalloc(MAX_MODULE_INPUT_TEXT_LEN);
 	for (src = in_action, dest = action; *src != 0; src++)
 	{
 		if (*src != '$')

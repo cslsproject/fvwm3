@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -86,7 +85,7 @@ void fgettext_add_one_path(char *path, int position)
 		domain = FGDefaultDomain;
 	}
 
-	tmp = (FGettextPath *)safemalloc(sizeof(FGettextPath));
+	tmp = xmalloc(sizeof(FGettextPath));
 	tmp->dir = dir;
 	CopyString(&tmp->domain, domain);
 
@@ -148,7 +147,7 @@ void FGettextInit(const char *domain, const char *dir, const char *module)
 	FGModuleName = module;
 	CopyString(&FGDefaultDir, btd);
 	CopyString(&FGDefaultDomain, td);
-	FGLastPath = (FGettextPath *)safemalloc(sizeof(FGettextPath));
+	FGLastPath = xmalloc(sizeof(FGettextPath));
 	CopyString(&FGLastPath->domain, td);
 	CopyString(&FGLastPath->dir, btd);
 	FGPathList = flist_append_obj(FGPathList, FGLastPath);
@@ -223,7 +222,7 @@ void FGettextSetLocalePath(const char *path)
 	if (path == NULL || path[0] == '\0')
 	{
 		fgettext_free_fgpath_list();
-		FGLastPath = (FGettextPath *)safemalloc(sizeof(FGettextPath));
+		FGLastPath = xmalloc(sizeof(FGettextPath));
 		CopyString(&FGLastPath->domain, FGDefaultDomain);
 		CopyString(&FGLastPath->dir, FGDefaultDir);
 		FGPathList = flist_append_obj(FGPathList, FGLastPath);

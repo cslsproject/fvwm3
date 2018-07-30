@@ -10,8 +10,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 
 /* ---------------------------- included header files ---------------------- */
@@ -195,8 +194,7 @@ void fqueue_add_at_front(
 {
 	fqueue_record *rec;
 
-	rec = (fqueue_record *)safemalloc(sizeof(fqueue_record));
-	memset(rec, 0, sizeof(*rec));
+	rec = xcalloc(1, sizeof *rec);
 	rec->object = object;
 	rec->next = fq->first;
 	if (fq->lock_level > 0)
@@ -214,8 +212,7 @@ void fqueue_add_at_end(
 {
 	fqueue_record *rec;
 
-	rec = (fqueue_record *)safemalloc(sizeof(fqueue_record));
-	memset(rec, 0, sizeof(*rec));
+	rec = xcalloc(1, sizeof *rec);
 	rec->object = object;
 	if (fq->lock_level > 0)
 	{
@@ -243,8 +240,7 @@ void fqueue_add_inside(
 	fqueue_record *p;
 	fqueue_record *t;
 
-	rec = (fqueue_record *)safemalloc(sizeof(fqueue_record));
-	memset(rec, 0, sizeof(*rec));
+	rec = xcalloc(1, sizeof *rec);
 	rec->object = object;
 	if (fq->lock_level > 0)
 	{

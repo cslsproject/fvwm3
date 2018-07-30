@@ -10,34 +10,13 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-/*
- * This module is all original code
- * by Rob Nation
- * Copyright 1993, Robert Nation
- *     You may use this code for any purpose, as long as the original
- *     copyright remains in the source code and all documentation
+ * along with this program; if not, see: <http://www.gnu.org/licenses/>
  */
 /*
   Changed 02/12/97 by Dan Espen:
   - added routines to determine color closeness, for color use reduction.
   Some of the logic comes from pixy2, so the copyright is below.
 */
-/*
- * Copyright 1996, Romano Giannetti. No guarantees or warantees or anything
- * are provided or implied in any way whatsoever. Use this program at your
- * own risk. Permission to use this program for any purpose is given,
- * as long as the copyright is kept intact.
- *
- * Romano Giannetti - Dipartimento di Ingegneria dell'Informazione
- *                    via Diotisalvi, 2  PISA
- * mailto:romano@iet.unipi.it
- * http://www.iet.unipi.it/~romano
- *
- */
 
 /*
  *
@@ -240,8 +219,7 @@ FvwmPicture *PLoadFvwmPictureFromPixmap(
 {
 	FvwmPicture *q;
 
-	q = (FvwmPicture*)safemalloc(sizeof(FvwmPicture));
-	memset(q, 0, sizeof(FvwmPicture));
+	q = xcalloc(1, sizeof(FvwmPicture));
 	q->count = 1;
 	q->name = name;
 	q->next = NULL;
